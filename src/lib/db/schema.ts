@@ -24,7 +24,7 @@ export const users = pgTable("users", {
     kycVerified: boolean("kyc_verified").default(false),
 }, (users) => {
     return {
-        emailIndex: uniqueIndex("email_index").on(users.email),
+        emailIndex: uniqueIndex("user_email_index").on(users.email),
     }
 });
 
@@ -99,7 +99,7 @@ export const organizations = pgTable('organizations', {
     ownerId: uuid('owner_id').references(() => users.id).notNull(),
     universityId: uuid('university_id').references(() => universities.id).notNull(),
 }, (organizations) => ({
-    nameIndex: uniqueIndex('name_index').on(organizations.name),
+    nameIndex: uniqueIndex('organization_name_index').on(organizations.name),
 }));
 
 export const organizationsRelations = relations(organizations, ({ many, one }) => ({
@@ -226,16 +226,10 @@ export const universities = pgTable('universities', {
     updatedBy: uuid('updated_by').references(() => users.id).notNull(),
     image: text('image').notNull(),
 }, (universities) => ({
-    nameIndex: uniqueIndex('name_index').on(universities.name),
+    nameIndex: uniqueIndex('university_name_index').on(universities.name),
 }));
 
 export const universitiesRelations = relations(universities, ({ many }) => ({
-    organizations: many(organizations, {
-        fields: [universities.id],
-        references: [organizations.universityId],
-    }),
-    events: many(events, {
-        fields: [universities.id],
-        references: [events.universityId],
-    }),
+    organizations: many(organizations),
+    events: many(events),
 }));
