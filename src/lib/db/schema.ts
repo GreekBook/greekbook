@@ -105,7 +105,10 @@ export const organizations = pgTable('organizations', {
 export const organizationsRelations = relations(organizations, ({ many, one }) => ({
     usersToOrganizations: many(usersToOrganizations),
     roles: many(roles),
-    university: one(universities),
+    university: one(universities, {
+        fields: [organizations.universityId],
+        references: [universities.id],
+    }),
 }));
 
 // End Orgs --------------------
@@ -174,8 +177,14 @@ export const events = pgTable('events', {
 });
 
 export const eventsRelations = relations(events, ({ one }) => ({
-    organization: one(organizations),
-    university: one(universities),
+    organization: one(organizations, {
+        fields: [events.organizationId],
+        references: [organizations.id],
+    }),
+    university: one(universities, {
+        fields: [events.universityId],
+        references: [universities.id],
+    }),
 }));
 
 // End Events --------------------
@@ -221,6 +230,12 @@ export const universities = pgTable('universities', {
 }));
 
 export const universitiesRelations = relations(universities, ({ many }) => ({
-    organizations: many(organizations),
-    events: many(events),
+    organizations: many(organizations, {
+        fields: [universities.id],
+        references: [organizations.universityId],
+    }),
+    events: many(events, {
+        fields: [universities.id],
+        references: [events.universityId],
+    }),
 }));
