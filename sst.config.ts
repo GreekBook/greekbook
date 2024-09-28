@@ -9,7 +9,7 @@ export default $config({
     };
   },
   async run() {
-    const vpc = new sst.aws.Vpc("GreekBookVPC");
+    const vpc = new sst.aws.Vpc("GreekBookVPC", {nat: "managed"});
     const database = new sst.aws.Postgres("GreekBookDB", { vpc });
     const bucket = new sst.aws.Bucket("GreekBookOrgEventImages", {
       access: "public"

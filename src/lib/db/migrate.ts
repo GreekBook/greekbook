@@ -8,4 +8,4 @@ export const migrate = async (path: string) => {
 };
 
 // @ts-expect-error - this is fine to do.
-await migrate("../../../drizzle/migrations/");
+await migrate("./drizzle/");
