@@ -11,6 +11,9 @@ export default $config({
   async run() {
     const vpc = new sst.aws.Vpc("GreekBookVPC");
     const database = new sst.aws.Postgres("GreekBookDB", { vpc });
+    const bucket = new sst.aws.Bucket("GreekBookOrgEventImages", {
+      access: "public"
+    });
     new sst.aws.Nextjs("GreekBook", {
         link: [database],
 	domain: "headlinerai.net",
