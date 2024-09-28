@@ -96,7 +96,7 @@ export const organizations = pgTable('organizations', {
     description: text('description').notNull(),
     createdAt: timestamp('created_at').notNull(),
     updatedAt: timestamp('updated_at').notNull(),
-    ownerId: serial('owner_id').references(() => users.id).notNull(),
+    ownerId: uuid('owner_id').references(() => users.id).notNull(),
 }, (organizations) => ({
     nameIndex: uniqueIndex('name_index').on(organizations.name),
 }));
