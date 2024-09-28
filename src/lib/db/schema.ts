@@ -38,7 +38,7 @@ export type NewUser = typeof users.$inferInsert; // insert type
 export const accounts = pgTable(
     "account",
     {
-        userId: text("userId")
+        userId: uuid("userId")
             .notNull()
             .references(() => users.id, { onDelete: "cascade" }),
         type: text("type").$type<AdapterAccountType>().notNull(),
@@ -61,7 +61,7 @@ export const accounts = pgTable(
 
 export const sessions = pgTable("session", {
     sessionToken: text("sessionToken").primaryKey(),
-    userId: text("userId")
+    userId: uuid("userId")
         .notNull()
         .references(() => users.id, { onDelete: "cascade" }),
     expires: timestamp("expires", { mode: "date" }).notNull(),
@@ -71,7 +71,7 @@ export const authenticators = pgTable(
     "authenticator",
     {
         credentialID: text("credentialID").notNull().unique(),
-        userId: text("userId")
+        userId: uuid("userId")
             .notNull()
             .references(() => users.id, { onDelete: "cascade" }),
         providerAccountId: text("providerAccountId").notNull(),
@@ -91,7 +91,7 @@ export const authenticators = pgTable(
 // End users --------------------
 
 export const organizations = pgTable('organizations', {
-    id: uuid('id').primaryKey().defaultRandom(),
+    id: uuid('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
     name: text('name').notNull().notNull(),
     description: text('description').notNull(),
     createdAt: timestamp('created_at').notNull(),
@@ -152,7 +152,7 @@ export const usersToOrganizationsRelations = relations(usersToOrganizations, ({ 
 // End users to groups --------------------
 
 export const events = pgTable('events', {
-    id: uuid('id').primaryKey().defaultRandom(),
+    id: uuid('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
     title: text('title').notNull(),
     description: text('description').notNull(),
     startDate: timestamp('start_date').notNull(),
@@ -171,10 +171,7 @@ export const events = pgTable('events', {
 });
 
 export const eventsRelations = relations(events, ({ one }) => ({
-    organization: one(organizations, {
-        fields: [events.organizationId],
-        references: [organizations.id],
-    }),
+    organization: one(organizations),
 }));
 
 // End Events --------------------
