@@ -1,5 +1,5 @@
 {
-  "id": "e65fa0c9-b154-4ecd-a75d-a81c723dbf90",
+  "id": "7697e60f-e85b-41cf-b66b-91d45f308432",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -330,6 +330,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "university_id": {
+          "name": "university_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
         "paid": {
           "name": "paid",
           "type": "boolean",
@@ -391,6 +397,19 @@
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
+        },
+        "events_university_id_universities_id_fk": {
+          "name": "events_university_id_universities_id_fk",
+          "tableFrom": "events",
+          "tableTo": "universities",
+          "columnsFrom": [
+            "university_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
@@ -435,11 +454,17 @@
           "type": "uuid",
           "primaryKey": false,
           "notNull": true
+        },
+        "university_id": {
+          "name": "university_id",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {
-        "name_index": {
-          "name": "name_index",
+        "organization_name_index": {
+          "name": "organization_name_index",
           "columns": [
             {
               "expression": "name",
@@ -461,6 +486,19 @@
           "tableTo": "users",
           "columnsFrom": [
             "owner_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "organizations_university_id_universities_id_fk": {
+          "name": "organizations_university_id_universities_id_fk",
+          "tableFrom": "organizations",
+          "tableTo": "universities",
+          "columnsFrom": [
+            "university_id"
           ],
           "columnsTo": [
             "id"
@@ -557,6 +595,115 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
+    "public.universities": {
+      "name": "universities",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "created_by": {
+          "name": "created_by",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_at": {
+          "name": "updated_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "updated_by": {
+          "name": "updated_by",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "image": {
+          "name": "image",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {
+        "university_name_index": {
+          "name": "university_name_index",
+          "columns": [
+            {
+              "expression": "name",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
+      "foreignKeys": {
+        "universities_created_by_users_id_fk": {
+          "name": "universities_created_by_users_id_fk",
+          "tableFrom": "universities",
+          "tableTo": "users",
+          "columnsFrom": [
+            "created_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        },
+        "universities_updated_by_users_id_fk": {
+          "name": "universities_updated_by_users_id_fk",
+          "tableFrom": "universities",
+          "tableTo": "users",
+          "columnsFrom": [
+            "updated_by"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "universities_name_unique": {
+          "name": "universities_name_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "name"
+          ]
+        }
+      }
+    },
     "public.users": {
       "name": "users",
       "schema": "",
@@ -591,29 +738,37 @@
           "primaryKey": false,
           "notNull": false
         },
+        "onboarded": {
+          "name": "onboarded",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
+        },
         "role": {
           "name": "role",
           "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "'user'"
         },
         "date_of_birth": {
           "name": "date_of_birth",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "kyc_verified": {
           "name": "kyc_verified",
           "type": "boolean",
           "primaryKey": false,
-          "notNull": true,
+          "notNull": false,
           "default": false
         }
       },
       "indexes": {
-        "email_index": {
-          "name": "email_index",
+        "user_email_index": {
+          "name": "user_email_index",
           "columns": [
             {
               "expression": "email",
