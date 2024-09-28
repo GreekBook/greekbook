@@ -32,6 +32,7 @@ CREATE TABLE IF NOT EXISTS "session" (
 	"expires" timestamp NOT NULL
 );
 --> statement-breakpoint
+ALTER TABLE "events" ALTER COLUMN "organization_id" SET DATA TYPE uuid;--> statement-breakpoint
 ALTER TABLE "users" ALTER COLUMN "id" DROP DEFAULT;--> statement-breakpoint
 ALTER TABLE "users" ALTER COLUMN "name" DROP NOT NULL;--> statement-breakpoint
 ALTER TABLE "users" ALTER COLUMN "email" DROP NOT NULL;--> statement-breakpoint
