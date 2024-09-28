@@ -12,7 +12,7 @@ import {
 import {relations, sql} from "drizzle-orm";
 import type { AdapterAccountType } from "next-auth/adapters"
 
-export const users = pgTable("users", {
+export const user = pgTable("user", {
     id: uuid('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
     name: text("name"),
     email: text("email").unique(),
@@ -28,19 +28,19 @@ export const users = pgTable("users", {
     }
 });
 
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(user, ({ many }) => ({
     usersToGroups: many(usersToOrganizations),
 }));
 
-export type User = typeof users.$inferSelect; // return type when queried
-export type NewUser = typeof users.$inferInsert; // insert type
+export type User = typeof user.$inferSelect; // return type when queried
+export type NewUser = typeof user.$inferInsert; // insert type
 
 export const accounts = pgTable(
     "account",
     {
         userId: uuid("userId")
             .notNull()
-            .references(() => users.id, { onDelete: "cascade" }),
+            .references(() => user.id, { onDelete: "cascade" }),
         type: text("type").$type<AdapterAccountType>().notNull(),
         provider: text("provider").notNull(),
         providerAccountId: text("providerAccountId").notNull(),
@@ -63,7 +63,7 @@ export const sessions = pgTable("session", {
     sessionToken: text("sessionToken").primaryKey(),
     userId: uuid("userId")
         .notNull()
-        .references(() => users.id, { onDelete: "cascade" }),
+        .references(() => user.id, { onDelete: "cascade" }),
     expires: timestamp("expires", { mode: "date" }).notNull(),
 })
 
@@ -73,7 +73,7 @@ export const authenticators = pgTable(
         credentialID: text("credentialID").notNull().unique(),
         userId: uuid("userId")
             .notNull()
-            .references(() => users.id, { onDelete: "cascade" }),
+            .references(() => user.id, { onDelete: "cascade" }),
         providerAccountId: text("providerAccountId").notNull(),
         credentialPublicKey: text("credentialPublicKey").notNull(),
         counter: integer("counter").notNull(),
@@ -96,7 +96,7 @@ export const organizations = pgTable('organizations', {
     description: text('description').notNull(),
     createdAt: timestamp('created_at').notNull(),
     updatedAt: timestamp('updated_at').notNull(),
-    ownerId: uuid('owner_id').references(() => users.id).notNull(),
+    ownerId: uuid('owner_id').references(() => user.id).notNull(),
     universityId: uuid('university_id').references(() => universities.id).notNull(),
 }, (organizations) => ({
     nameIndex: uniqueIndex('organization_name_index').on(organizations.name),
@@ -132,7 +132,7 @@ export const usersToOrganizations = pgTable(
     {
         userId: uuid('user_id')
             .notNull()
-            .references(() => users.id),
+            .references(() => user.id),
         organizationId: uuid('organization_id')
             .notNull()
             .references(() => organizations.id),
@@ -148,9 +148,9 @@ export const usersToOrganizationsRelations = relations(usersToOrganizations, ({ 
         fields: [usersToOrganizations.organizationId],
         references: [organizations.id],
     }),
-    user: one(users, {
+    user: one(user, {
         fields: [usersToOrganizations.userId],
-        references: [users.id],
+        references: [user.id],
     }),
 }));
 
@@ -193,7 +193,7 @@ export const eventAttendees = pgTable(
     'event_attendees',
     {
         eventId: uuid('event_id').notNull().references(() => events.id),
-        userId: uuid('user_id').notNull().references(() => users.id),
+        userId: uuid('user_id').notNull().references(() => user.id),
         status: text('status').$type<'ticket_online' | 'ticket_in_person' | 'list' | 'free-entry'>().notNull(),
         attended: boolean('attended').default(false).notNull(),
         checkedInAt: timestamp('checked_in_at'),
@@ -208,9 +208,9 @@ export const eventAttendeesRelations = relations(eventAttendees, ({ one }) => ({
         fields: [eventAttendees.eventId],
         references: [events.id],
     }),
-    user: one(users, {
+    user: one(user, {
         fields: [eventAttendees.userId],
-        references: [users.id],
+        references: [user.id],
     }),
 }));
 
@@ -221,9 +221,9 @@ export const universities = pgTable('universities', {
     name: text('name').unique().notNull(),
     description: text('description').notNull(),
     createdAt: timestamp('created_at').notNull(),
-    createdBy: uuid('created_by').references(() => users.id).notNull(),
+    createdBy: uuid('created_by').references(() => user.id).notNull(),
     updatedAt: timestamp('updated_at').notNull(),
-    updatedBy: uuid('updated_by').references(() => users.id).notNull(),
+    updatedBy: uuid('updated_by').references(() => user.id).notNull(),
     image: text('image').notNull(),
 }, (universities) => ({
     nameIndex: uniqueIndex('university_name_index').on(universities.name),
