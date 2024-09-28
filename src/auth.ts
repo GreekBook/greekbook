@@ -12,6 +12,7 @@ declare module "next-auth" {
             role: "admin" | "user",
             dateOfBirth: string,
             kycVerified: boolean,
+            onboarded: boolean,
             /**
              * By default, TypeScript merges new interface properties and overwrites existing ones.
              * In this case, the default session user properties will be overwritten,
