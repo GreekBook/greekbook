@@ -160,7 +160,7 @@ export const events = pgTable('events', {
     location: text('location'),
     createdAt: timestamp('created_at').notNull(),
     updatedAt: timestamp('updated_at').notNull(),
-    organizationId: serial('organization_id').references(() => organizations.id).notNull(),
+    organizationId: uuid('organization_id').references(() => organizations.id).notNull(),
     paid: boolean('paid').default(false).notNull(),
     attendeesCapped: boolean('attendees_capped').default(false).notNull(),
     price: numeric('price'),
