@@ -18,9 +18,10 @@ export const users = pgTable("users", {
     email: text("email").unique(),
     emailVerified: timestamp("emailVerified", { mode: "date" }),
     image: text("image"),
-    role: text("role").$type<"admin" | "user">().notNull(),
-    dateOfBirth: timestamp("date_of_birth").notNull(),
-    kycVerified: boolean("kyc_verified").default(false).notNull(),
+    onboarded: boolean("onboarded").default(false).notNull(),
+    role: text("role").$type<"admin" | "user">().default("user").notNull(),
+    dateOfBirth: timestamp("date_of_birth"),
+    kycVerified: boolean("kyc_verified").default(false),
 }, (users) => {
     return {
         emailIndex: uniqueIndex("email_index").on(users.email),
