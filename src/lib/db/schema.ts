@@ -1,4 +1,4 @@
-import {serial, text, timestamp, pgTable, uniqueIndex, uuid, primaryKey} from "drizzle-orm/pg-core";
+import {serial, text, timestamp, pgTable, uniqueIndex, uuid, primaryKey, boolean, numeric} from "drizzle-orm/pg-core";
 import {relations, sql} from "drizzle-orm";
 
 export const users = pgTable("users", {
@@ -7,12 +7,13 @@ export const users = pgTable("users", {
     email: text("email").unique().notNull(),
     password: text("password").notNull(),
     role: text("role").$type<"admin" | "user">().notNull(),
+    dateOfBirth: timestamp("date_of_birth").notNull(),
+    kycVerified: boolean("kyc_verified").default(false).notNull(),
     createdAt: timestamp("created_at").notNull(),
     updatedAt: timestamp("updated_at").notNull(),
 }, (users) => {
     return {
         emailIndex: uniqueIndex("email_index").on(users.email),
-        idIndex: uniqueIndex("id_index").on(users.id),
     }
 });
 
@@ -32,19 +33,29 @@ export const organizations = pgTable('organizations', {
     createdAt: timestamp('created_at').notNull(),
     updatedAt: timestamp('updated_at').notNull(),
     ownerId: serial('owner_id').references(() => users.id).notNull(),
-});
+}, (organizations) => ({
+    nameIndex: uniqueIndex('name_index').on(organizations.name),
+}));
 
 export const organizationsRelations = relations(organizations, ({ many }) => ({
     usersToOrganizations: many(usersToOrganizations),
+    roles: many(roles),
 }));
 
 // End Orgs --------------------
 
 export const roles = pgTable('roles', {
-    organizationId: uuid('organization_id').notNull().references(() => organizations.id),
+    organizationId: uuid('organization_id').notNull().references(() => organizations.id).primaryKey(),
     name: text('name').notNull(),
     permissions: text('permissions').array().default(sql`'{}'::text[]`).notNull(),
 });
+
+export const rolesRelations = relations(roles, ({ one }) => ({
+    organization: one(organizations, {
+        fields: [roles.organizationId],
+        references: [organizations.id],
+    }),
+}));
 
 // End Roles
 export const usersToOrganizations = pgTable(
@@ -63,8 +74,8 @@ export const usersToOrganizations = pgTable(
     }),
 );
 
-export const usersToGroupsRelations = relations(usersToOrganizations, ({ one }) => ({
-    group: one(organizations, {
+export const usersToOrganizationsRelations = relations(usersToOrganizations, ({ one }) => ({
+    organization: one(organizations, {
         fields: [usersToOrganizations.organizationId],
         references: [organizations.id],
     }),
@@ -85,5 +96,48 @@ export const events = pgTable('events', {
     location: text('location'),
     createdAt: timestamp('created_at').notNull(),
     updatedAt: timestamp('updated_at').notNull(),
-    ownerId: serial('owner_id').references(() => organizations.id).notNull(),
+    organizationId: serial('organization_id').references(() => organizations.id).notNull(),
+    paid: boolean('paid').default(false).notNull(),
+    attendeesCapped: boolean('attendees_capped').default(false).notNull(),
+    price: numeric('price'),
+    maxAttendees: numeric('max_attendees'),
+    images: text('images').array().default(sql`'{}'::text[]`).notNull(),
+    tags: text('tags').array().default(sql`'{}'::text[]`).notNull(),
+    status: text('status').$type<'draft' | 'published' | 'past'>().notNull(),
 });
+
+export const eventsRelations = relations(events, ({ one }) => ({
+    organization: one(organizations, {
+        fields: [events.organizationId],
+        references: [organizations.id],
+    }),
+}));
+
+// End Events --------------------
+
+export const eventAttendees = pgTable(
+    'event_attendees',
+    {
+        eventId: uuid('event_id').notNull().references(() => events.id),
+        userId: uuid('user_id').notNull().references(() => users.id),
+        status: text('status').$type<'ticket_online' | 'ticket_in_person' | 'list' | 'free-entry'>().notNull(),
+        attended: boolean('attended').default(false).notNull(),
+        checkedInAt: timestamp('checked_in_at'),
+        createdAt: timestamp('created_at').notNull(),
+    }, (t) => ({
+        pk: primaryKey({ columns: [t.eventId, t.userId] }),
+    }),
+);
+
+export const eventAttendeesRelations = relations(eventAttendees, ({ one }) => ({
+    event: one(events, {
+        fields: [eventAttendees.eventId],
+        references: [events.id],
+    }),
+    user: one(users, {
+        fields: [eventAttendees.userId],
+        references: [users.id],
+    }),
+}));
+
+// End Event Attendees --------------------
