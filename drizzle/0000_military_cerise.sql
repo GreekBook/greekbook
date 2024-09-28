@@ -46,6 +46,7 @@ CREATE TABLE IF NOT EXISTS "events" (
 	"created_at" timestamp NOT NULL,
 	"updated_at" timestamp NOT NULL,
 	"organization_id" uuid NOT NULL,
+	"university_id" uuid NOT NULL,
 	"paid" boolean DEFAULT false NOT NULL,
 	"attendees_capped" boolean DEFAULT false NOT NULL,
 	"price" numeric,
@@ -61,7 +62,8 @@ CREATE TABLE IF NOT EXISTS "organizations" (
 	"description" text NOT NULL,
 	"created_at" timestamp NOT NULL,
 	"updated_at" timestamp NOT NULL,
-	"owner_id" uuid NOT NULL
+	"owner_id" uuid NOT NULL,
+	"university_id" uuid NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "roles" (
@@ -76,15 +78,28 @@ CREATE TABLE IF NOT EXISTS "session" (
 	"expires" timestamp NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "universities" (
+	"id" uuid PRIMARY KEY NOT NULL,
+	"name" text NOT NULL,
+	"description" text NOT NULL,
+	"created_at" timestamp NOT NULL,
+	"created_by" uuid NOT NULL,
+	"updated_at" timestamp NOT NULL,
+	"updated_by" uuid NOT NULL,
+	"image" text NOT NULL,
+	CONSTRAINT "universities_name_unique" UNIQUE("name")
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "users" (
 	"id" uuid PRIMARY KEY NOT NULL,
 	"name" text,
 	"email" text,
 	"emailVerified" timestamp,
 	"image" text,
-	"role" text NOT NULL,
-	"date_of_birth" timestamp NOT NULL,
-	"kyc_verified" boolean DEFAULT false NOT NULL,
+	"onboarded" boolean DEFAULT false NOT NULL,
+	"role" text DEFAULT 'user' NOT NULL,
+	"date_of_birth" timestamp,
+	"kyc_verified" boolean DEFAULT false,
 	CONSTRAINT "users_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
@@ -126,7 +141,19 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
+ ALTER TABLE "events" ADD CONSTRAINT "events_university_id_universities_id_fk" FOREIGN KEY ("university_id") REFERENCES "public"."universities"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  ALTER TABLE "organizations" ADD CONSTRAINT "organizations_owner_id_users_id_fk" FOREIGN KEY ("owner_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "organizations" ADD CONSTRAINT "organizations_university_id_universities_id_fk" FOREIGN KEY ("university_id") REFERENCES "public"."universities"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
@@ -144,6 +171,18 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
+ ALTER TABLE "universities" ADD CONSTRAINT "universities_created_by_users_id_fk" FOREIGN KEY ("created_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "universities" ADD CONSTRAINT "universities_updated_by_users_id_fk" FOREIGN KEY ("updated_by") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  ALTER TABLE "users_to_organizations" ADD CONSTRAINT "users_to_organizations_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
@@ -155,5 +194,6 @@ EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;
 --> statement-breakpoint
-CREATE UNIQUE INDEX IF NOT EXISTS "name_index" ON "organizations" USING btree ("name");--> statement-breakpoint
-CREATE UNIQUE INDEX IF NOT EXISTS "email_index" ON "users" USING btree ("email");
+CREATE UNIQUE INDEX IF NOT EXISTS "organization_name_index" ON "organizations" USING btree ("name");--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "university_name_index" ON "universities" USING btree ("name");--> statement-breakpoint
+CREATE UNIQUE INDEX IF NOT EXISTS "user_email_index" ON "users" USING btree ("email");

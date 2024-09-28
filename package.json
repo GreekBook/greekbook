@@ -8,8 +8,10 @@
     "dev": "next dev -H 0.0.0.0",
     "lint": "next lint",
     "start": "next start",
-    "generate": "drizzle-kit generate",
-    "migrate": "drizzle-kit migrate"
+    "generate": "sst shell drizzle-kit generate",
+    "migrate": "sst shell drizzle-kit migrate",
+    "db": "sst shell drizzle-kit",
+    "db:studio": "sst shell drizzle-kit studio"
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^1.5.3",
