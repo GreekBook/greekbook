@@ -1,14 +1,28 @@
-import NextAuth from "next-auth"
+import NextAuth, {DefaultSession} from "next-auth"
 import Google from "next-auth/providers/google"
 import {DrizzleAdapter} from "@auth/drizzle-adapter";
 import {db} from "@/lib/db/db";
-import {accounts, users, sessions} from "@/lib/db/schema";
+
+declare module "next-auth" {
+    /**
+     * Returned by `auth`, `useSession`, `getSession` and received as a prop on the `SessionProvider` React Context
+     */
+    interface Session {
+        user: {
+            role: "admin" | "user",
+            dateOfBirth: string,
+            kycVerified: boolean,
+            /**
+             * By default, TypeScript merges new interface properties and overwrites existing ones.
+             * In this case, the default session user properties will be overwritten,
+             * with the new ones defined above. To keep the default session user properties,
+             * you need to add them back into the newly declared interface.
+             */
+        } & DefaultSession["user"]
+    }
+}
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
-    adapter: DrizzleAdapter(db, {
-        usersTable: users,
-        accountsTable: accounts,
-        sessionsTable: sessions,
-    }),
+    adapter: DrizzleAdapter(db),
     providers: [Google],
 })
