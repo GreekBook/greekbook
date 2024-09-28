@@ -1,12 +1,21 @@
+'use client';
+
 import {useEffect, useState} from "react";
 
-function InstallPrompt() {
+//hacky ass fix.
+declare global {
+    interface Window {
+        MSStream: never;
+    }
+}
+
+export default function InstallPrompt() {
     const [isIOS, setIsIOS] = useState(false)
     const [isStandalone, setIsStandalone] = useState(false)
 
     useEffect(() => {
         setIsIOS(
-            /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream
+            /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream
         )
 
         setIsStandalone(window.matchMedia('(display-mode: standalone)').matches)
@@ -34,19 +43,6 @@ function InstallPrompt() {
           </span>.
                 </p>
             )}
-        </div>
-    )
-}
-
-function PushNotificationManager() {
-    return null;
-}
-
-export default function Page() {
-    return (
-        <div>
-            <PushNotificationManager />
-            <InstallPrompt />
         </div>
     )
 }
