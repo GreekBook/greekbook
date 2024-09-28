@@ -5,6 +5,10 @@ import "sst"
 export {}
 declare module "sst" {
   export interface Resource {
+    "GreekBook": {
+      "type": "sst.aws.Nextjs"
+      "url": string
+    }
     "GreekBookDB": {
       "clusterArn": string
       "database": string
