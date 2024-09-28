@@ -3,7 +3,6 @@ import {
     timestamp,
     pgTable,
     uniqueIndex,
-    uuid,
     primaryKey,
     boolean,
     numeric,
@@ -13,7 +12,7 @@ import {relations, sql} from "drizzle-orm";
 import type { AdapterAccountType } from "next-auth/adapters"
 
 export const user = pgTable("user", {
-    id: uuid('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+    id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
     name: text("name"),
     email: text("email").unique(),
     emailVerified: timestamp("emailVerified", { mode: "date" }),
@@ -38,7 +37,7 @@ export type NewUser = typeof user.$inferInsert; // insert type
 export const accounts = pgTable(
     "account",
     {
-        userId: uuid("userId")
+        userId: text("userId")
             .notNull()
             .references(() => user.id, { onDelete: "cascade" }),
         type: text("type").$type<AdapterAccountType>().notNull(),
@@ -61,7 +60,7 @@ export const accounts = pgTable(
 
 export const sessions = pgTable("session", {
     sessionToken: text("sessionToken").primaryKey(),
-    userId: uuid("userId")
+    userId: text("userId")
         .notNull()
         .references(() => user.id, { onDelete: "cascade" }),
     expires: timestamp("expires", { mode: "date" }).notNull(),
@@ -71,7 +70,7 @@ export const authenticators = pgTable(
     "authenticator",
     {
         credentialID: text("credentialID").notNull().unique(),
-        userId: uuid("userId")
+        userId: text("userId")
             .notNull()
             .references(() => user.id, { onDelete: "cascade" }),
         providerAccountId: text("providerAccountId").notNull(),
@@ -91,13 +90,13 @@ export const authenticators = pgTable(
 // End users --------------------
 
 export const organizations = pgTable('organizations', {
-    id: uuid('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+    id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
     name: text('name').notNull().notNull(),
     description: text('description').notNull(),
     createdAt: timestamp('created_at').notNull(),
     updatedAt: timestamp('updated_at').notNull(),
-    ownerId: uuid('owner_id').references(() => user.id).notNull(),
-    universityId: uuid('university_id').references(() => universities.id).notNull(),
+    ownerId: text('owner_id').references(() => user.id).notNull(),
+    universityId: text('university_id').references(() => universities.id).notNull(),
 }, (organizations) => ({
     nameIndex: uniqueIndex('organization_name_index').on(organizations.name),
 }));
@@ -114,7 +113,7 @@ export const organizationsRelations = relations(organizations, ({ many, one }) =
 // End Orgs --------------------
 
 export const roles = pgTable('roles', {
-    organizationId: uuid('organization_id').notNull().references(() => organizations.id).primaryKey(),
+    organizationId: text('organization_id').notNull().references(() => organizations.id).primaryKey(),
     name: text('name').notNull(),
     permissions: text('permissions').array().default(sql`'{}'::text[]`).notNull(),
 });
@@ -130,10 +129,10 @@ export const rolesRelations = relations(roles, ({ one }) => ({
 export const usersToOrganizations = pgTable(
     'users_to_organizations',
     {
-        userId: uuid('user_id')
+        userId: text('user_id')
             .notNull()
             .references(() => user.id),
-        organizationId: uuid('organization_id')
+        organizationId: text('organization_id')
             .notNull()
             .references(() => organizations.id),
         role: text('role').$type<'admin' | 'member'>().notNull(),
@@ -157,7 +156,7 @@ export const usersToOrganizationsRelations = relations(usersToOrganizations, ({ 
 // End users to groups --------------------
 
 export const events = pgTable('events', {
-    id: uuid('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+    id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
     title: text('title').notNull(),
     description: text('description').notNull(),
     startDate: timestamp('start_date').notNull(),
@@ -165,8 +164,8 @@ export const events = pgTable('events', {
     location: text('location'),
     createdAt: timestamp('created_at').notNull(),
     updatedAt: timestamp('updated_at').notNull(),
-    organizationId: uuid('organization_id').references(() => organizations.id).notNull(),
-    universityId: uuid('university_id').references(() => universities.id).notNull(),
+    organizationId: text('organization_id').references(() => organizations.id).notNull(),
+    universityId: text('university_id').references(() => universities.id).notNull(),
     paid: boolean('paid').default(false).notNull(),
     attendeesCapped: boolean('attendees_capped').default(false).notNull(),
     price: numeric('price'),
@@ -192,8 +191,8 @@ export const eventsRelations = relations(events, ({ one }) => ({
 export const eventAttendees = pgTable(
     'event_attendees',
     {
-        eventId: uuid('event_id').notNull().references(() => events.id),
-        userId: uuid('user_id').notNull().references(() => user.id),
+        eventId: text('event_id').notNull().references(() => events.id),
+        userId: text('user_id').notNull().references(() => user.id),
         status: text('status').$type<'ticket_online' | 'ticket_in_person' | 'list' | 'free-entry'>().notNull(),
         attended: boolean('attended').default(false).notNull(),
         checkedInAt: timestamp('checked_in_at'),
@@ -217,13 +216,13 @@ export const eventAttendeesRelations = relations(eventAttendees, ({ one }) => ({
 // End Event Attendees --------------------
 
 export const universities = pgTable('universities', {
-    id: uuid('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+    id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
     name: text('name').unique().notNull(),
     description: text('description').notNull(),
     createdAt: timestamp('created_at').notNull(),
-    createdBy: uuid('created_by').references(() => user.id).notNull(),
+    createdBy: text('created_by').references(() => user.id).notNull(),
     updatedAt: timestamp('updated_at').notNull(),
-    updatedBy: uuid('updated_by').references(() => user.id).notNull(),
+    updatedBy: text('updated_by').references(() => user.id).notNull(),
     image: text('image').notNull(),
 }, (universities) => ({
     nameIndex: uniqueIndex('university_name_index').on(universities.name),
