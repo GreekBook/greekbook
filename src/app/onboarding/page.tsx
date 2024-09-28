@@ -40,12 +40,28 @@ export default function Onboarding() {
                     name="name"
                     render={({ field }) => (
                         <FormItem>
-                            <FormLabel>Username</FormLabel>
+                            <FormLabel>Name</FormLabel>
                             <FormControl>
-                                <Input placeholder="shadcn"  {...field} />
+                                <Input placeholder="shadcn" required={true} {...field} />
                             </FormControl>
                             <FormDescription>
-                                This is your public display name.
+                                First and Last Name.
+                            </FormDescription>
+                            <FormMessage />
+                        </FormItem>
+                    )}
+                />
+                <FormField
+                    control={form.control}
+                    name="dateOfBirth"
+                    render={({ field }) => (
+                        <FormItem>
+                            <FormLabel>Date of Birth</FormLabel>
+                            <FormControl>
+                                <Input placeholder="shadcn" type="date" required={true} {...field} />
+                            </FormControl>
+                            <FormDescription>
+                                Date of Birth.
                             </FormDescription>
                             <FormMessage />
                         </FormItem>
