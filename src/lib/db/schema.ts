@@ -97,13 +97,15 @@ export const organizations = pgTable('organizations', {
     createdAt: timestamp('created_at').notNull(),
     updatedAt: timestamp('updated_at').notNull(),
     ownerId: uuid('owner_id').references(() => users.id).notNull(),
+    universityId: uuid('university_id').references(() => universities.id).notNull(),
 }, (organizations) => ({
     nameIndex: uniqueIndex('name_index').on(organizations.name),
 }));
 
-export const organizationsRelations = relations(organizations, ({ many }) => ({
+export const organizationsRelations = relations(organizations, ({ many, one }) => ({
     usersToOrganizations: many(usersToOrganizations),
     roles: many(roles),
+    university: one(universities),
 }));
 
 // End Orgs --------------------
@@ -161,6 +163,7 @@ export const events = pgTable('events', {
     createdAt: timestamp('created_at').notNull(),
     updatedAt: timestamp('updated_at').notNull(),
     organizationId: uuid('organization_id').references(() => organizations.id).notNull(),
+    universityId: uuid('university_id').references(() => universities.id).notNull(),
     paid: boolean('paid').default(false).notNull(),
     attendeesCapped: boolean('attendees_capped').default(false).notNull(),
     price: numeric('price'),
@@ -172,6 +175,7 @@ export const events = pgTable('events', {
 
 export const eventsRelations = relations(events, ({ one }) => ({
     organization: one(organizations),
+    university: one(universities),
 }));
 
 // End Events --------------------
@@ -202,3 +206,21 @@ export const eventAttendeesRelations = relations(eventAttendees, ({ one }) => ({
 }));
 
 // End Event Attendees --------------------
+
+export const universities = pgTable('universities', {
+    id: uuid('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+    name: text('name').unique().notNull(),
+    description: text('description').notNull(),
+    createdAt: timestamp('created_at').notNull(),
+    createdBy: uuid('created_by').references(() => users.id).notNull(),
+    updatedAt: timestamp('updated_at').notNull(),
+    updatedBy: uuid('updated_by').references(() => users.id).notNull(),
+    image: text('image').notNull(),
+}, (universities) => ({
+    nameIndex: uniqueIndex('name_index').on(universities.name),
+}));
+
+export const universitiesRelations = relations(universities, ({ many }) => ({
+    organizations: many(organizations),
+    events: many(events),
+}));
