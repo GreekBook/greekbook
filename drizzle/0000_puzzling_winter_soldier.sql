@@ -61,7 +61,7 @@ CREATE TABLE IF NOT EXISTS "organizations" (
 	"description" text NOT NULL,
 	"created_at" timestamp NOT NULL,
 	"updated_at" timestamp NOT NULL,
-	"owner_id" serial NOT NULL
+	"owner_id" uuid NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "roles" (
