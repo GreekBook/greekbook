@@ -1,5 +1,4 @@
 import {
-    serial,
     text,
     timestamp,
     pgTable,
