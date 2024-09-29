@@ -1,103 +1,97 @@
+'use client';
+
 import Image from "next/image";
-import PushNotificationManager from "@/components/push-notification-manager";
-import SignIn from "@/components/sign-in";
+import {Search} from "lucide-react";
+import {useState} from "react";
+import {Select, SelectContent, SelectItem, SelectTrigger, SelectValue} from "@/components/ui/select";
+import {ModeToggle} from "@/components/theme-changer";
+
 export default function Home() {
+  const [eventType, setEventType] = useState('party')
+  const [location, setLocation] = useState('All Chapters')
+  const [price, setPrice] = useState('Any')
+
+  const upcomingEvents = [
+    { id: 1, title: "Alpha Beta Gamma Mixer", location: "Alpha Beta Gamma House", image: "/placeholder.svg?height=200&width=300" },
+    { id: 2, title: "Delta Epsilon Spring Formal", location: "Grand Ballroom", image: "/placeholder.svg?height=200&width=300" },
+    { id: 3, title: "Zeta Eta Beach Party", location: "Zeta Eta House", image: "/placeholder.svg?height=200&width=300" },
+  ]
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <SignIn />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-        <PushNotificationManager />
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      <div className="flex flex-col min-h-screen bg-teal-100 dark:bg-zinc-900">
+        <header className="flex justify-between items-center p-4 bg-white dark:bg-zinc-800">
+          <h1 className="text-2xl font-bold text-teal-600">GreekBook</h1>
+          <ModeToggle/>
+        </header>
+
+        <main className="flex-grow p-4 pb-20 overflow-y-auto">
+          <div className="bg-white dark:bg-slate-700 rounded-xl p-4 shadow-lg mb-6">
+            <h2 className="text-2xl font-semibold mb-4">I want to attend a</h2>
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2">
+              <span
+                  className={`px-3 py-1 rounded-full ${eventType === 'party' ? 'bg-teal-500 text-white' : 'bg-gray-200 dark:bg-stone-800'}`}
+                  onClick={() => setEventType('party')}>Party</span>
+                <span
+                    className={`px-3 py-1 rounded-full ${eventType === 'formal' ? 'bg-teal-500 text-white' : 'bg-gray-200 dark:bg-stone-800    '}`}
+                    onClick={() => setEventType('formal')}>Formal</span>
+              </div>
+              <Select
+                  value={location}
+                  onValueChange={(value) => setLocation(value)}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="All Chapters" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="x">Alpha Beta Gamma</SelectItem>
+                  <SelectItem value="y">Delta Epsilon</SelectItem>
+                  <SelectItem value="z">Zeta Eta</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select
+                  value={price}
+                  onValueChange={(value) => setPrice(value)}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Any" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="x">$0 - $10</SelectItem>
+                  <SelectItem value="y">$11 - $20</SelectItem>
+                  <SelectItem value="z">$21+</SelectItem>
+                </SelectContent>
+              </Select>
+              <button
+                  className="w-full bg-blue-500 text-white font-semibold py-3 px-4 rounded-lg flex items-center justify-center">
+                <Search className="w-5 h-5 mr-2"/>
+                Search
+              </button>
+            </div>
+          </div>
+
+          <div className="space-y-4">
+            {upcomingEvents.map((event) => (
+                <div key={event.id} className="bg-white dark:bg-slate-700 rounded-xl overflow-hidden shadow-lg">
+                  <Image
+                      src={event.image}
+                      alt={event.title}
+                      width={300}
+                      height={200}
+                      className="w-full h-40 object-cover"
+                  />
+                  <div className="p-4">
+                    <h3 className="font-semibold text-lg">{event.title}</h3>
+                    <p className="text-sm text-gray-600">{event.location}</p>
+                  </div>
+                  <div className="px-4 pb-4 flex justify-between items-center">
+                    <span className="bg-teal-100 text-teal-800 text-xs px-2 py-1 rounded-full">Featured</span>
+                    <button className="bg-blue-500 text-white px-4 py-2 rounded-full text-sm">View</button>
+                  </div>
+                </div>
+            ))}
+          </div>
+        </main>
+      </div>
   );
 }

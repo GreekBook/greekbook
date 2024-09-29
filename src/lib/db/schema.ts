@@ -231,3 +231,6 @@ export const universitiesRelations = relations(universities, ({ many }) => ({
     organizations: many(organizations),
     events: many(events),
 }));
+
+export type University = typeof universities.$inferSelect; // return type when queried
+export type NewUniversity = typeof universities.$inferInsert; // insert type
