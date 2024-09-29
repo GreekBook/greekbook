@@ -1,5 +1,5 @@
 {
-  "id": "9829ea1f-604c-4747-8426-e8da897ea815",
+  "id": "47fa3c50-50e3-4181-a08a-005cd94ec507",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -324,6 +324,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "featured_at": {
+          "name": "featured_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": false
+        },
         "organization_id": {
           "name": "organization_id",
           "type": "text",
@@ -362,12 +368,11 @@
           "primaryKey": false,
           "notNull": false
         },
-        "images": {
-          "name": "images",
-          "type": "text[]",
+        "image": {
+          "name": "image",
+          "type": "text",
           "primaryKey": false,
-          "notNull": true,
-          "default": "'{}'::text[]"
+          "notNull": true
         },
         "tags": {
           "name": "tags",
@@ -381,6 +386,13 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "internal": {
+          "name": "internal",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true,
+          "default": false
         }
       },
       "indexes": {},
@@ -723,12 +735,6 @@
         "email": {
           "name": "email",
           "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "emailVerified": {
-          "name": "emailVerified",
-          "type": "timestamp",
           "primaryKey": false,
           "notNull": false
         },

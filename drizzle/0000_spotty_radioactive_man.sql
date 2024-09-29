@@ -45,15 +45,17 @@ CREATE TABLE IF NOT EXISTS "events" (
 	"location" text,
 	"created_at" timestamp NOT NULL,
 	"updated_at" timestamp NOT NULL,
+	"featured_at" timestamp,
 	"organization_id" text NOT NULL,
 	"university_id" text NOT NULL,
 	"paid" boolean DEFAULT false NOT NULL,
 	"attendees_capped" boolean DEFAULT false NOT NULL,
 	"price" numeric,
 	"max_attendees" numeric,
-	"images" text[] DEFAULT '{}'::text[] NOT NULL,
+	"image" text NOT NULL,
 	"tags" text[] DEFAULT '{}'::text[] NOT NULL,
-	"status" text NOT NULL
+	"status" text NOT NULL,
+	"internal" boolean DEFAULT false NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "organizations" (
@@ -94,7 +96,6 @@ CREATE TABLE IF NOT EXISTS "user" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" text,
 	"email" text,
-	"emailVerified" timestamp,
 	"image" text,
 	"onboarded" boolean DEFAULT false NOT NULL,
 	"role" text DEFAULT 'user' NOT NULL,

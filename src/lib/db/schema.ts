@@ -163,18 +163,25 @@ export const events = pgTable('events', {
     location: text('location'),
     createdAt: timestamp('created_at').notNull(),
     updatedAt: timestamp('updated_at').notNull(),
+    featuredAt: timestamp('featured_at'),
     organizationId: text('organization_id').references(() => organizations.id).notNull(),
     universityId: text('university_id').references(() => universities.id).notNull(),
     paid: boolean('paid').default(false).notNull(),
     attendeesCapped: boolean('attendees_capped').default(false).notNull(),
     price: numeric('price'),
     maxAttendees: numeric('max_attendees'),
-    images: text('images').array().default(sql`'{}'::text[]`).notNull(),
+    image: text('image').notNull(),
     tags: text('tags').array().default(sql`'{}'::text[]`).notNull(),
     status: text('status').$type<'draft' | 'published' | 'past'>().notNull(),
+    internal: boolean('internal').default(false).notNull(),
 });
 
-export const eventsRelations = relations(events, ({ one }) => ({
+export type Event = typeof events.$inferSelect; // return type when queried
+export type EventWithAttendees = typeof eventsRelations.table.$inferSelect;
+
+export type NewEvent = typeof events.$inferInsert; // insert type
+
+export const eventsRelations = relations(events, ({ one, many }) => ({
     organization: one(organizations, {
         fields: [events.organizationId],
         references: [organizations.id],
@@ -183,6 +190,7 @@ export const eventsRelations = relations(events, ({ one }) => ({
         fields: [events.universityId],
         references: [universities.id],
     }),
+    attendees: many(eventAttendees),
 }));
 
 // End Events --------------------
