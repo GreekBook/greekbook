@@ -51,7 +51,12 @@ const config: Config = {
   				'5': 'hsl(var(--chart-5))'
   			}
   		},
-  		borderRadius: {
+		fontFamily: {
+			sans: ['var(--font-geist-sans)'],
+			serif: ['var(--font-geist-serif)'],
+			museo: ['var(--font-museo-moderno)'],
+		},
+		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
   			sm: 'calc(var(--radius) - 4px)'

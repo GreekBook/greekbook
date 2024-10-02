@@ -2,8 +2,8 @@
 
 import {Input} from "@/components/ui/input";
 import {Search as SearchIcon} from "lucide-react";
-import { useSearchParams, usePathname, useRouter } from 'next/navigation';
-import { useDebouncedCallback } from 'use-debounce';
+import {usePathname, useRouter, useSearchParams} from "next/navigation";
+import {useDebouncedCallback} from "use-debounce";
 
 export default function Search() {
     const searchParams = useSearchParams();
@@ -26,7 +26,7 @@ export default function Search() {
         <div className="relative w-full max-w-sm">
             <Input
                 type="text"
-                placeholder="Search events..."
+                placeholder="Search organizations"
                 defaultValue={searchParams.get('query')?.toString()}
                 onChange={(e) => handleSearch(e.target.value)}
                 className="w-full"

@@ -2,12 +2,12 @@ import type { MetadataRoute } from 'next'
 
 export default function manifest(): MetadataRoute.Manifest {
     return {
-        name: 'Greekbook PWA',
-        short_name: 'GreekbookPWA',
-        description: 'A Progressive Web App built with Next.js',
+        name: 'VibePass PWA',
+        short_name: 'VibePass',
+        description: 'Next generation app for college social events.',
         start_url: '/',
         display: 'standalone',
-        background_color: '#ffffff',
+        background_color: '#000000',
         theme_color: '#000000',
         icons: [
             {

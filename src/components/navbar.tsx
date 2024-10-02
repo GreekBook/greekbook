@@ -7,7 +7,7 @@ import {usePathname} from "next/navigation";
 export default function Navbar() {
     const pathName = usePathname();
     return (
-        <footer className="sticky bottom-0 z-10 bg-background border-t border-border">
+        <footer className="sticky bottom-0 z-10 bg-background border-t border-border pb-2">
             <nav className="container mx-auto flex justify-around items-center py-2">
                 <Link href="/" className={`flex flex-col items-center ${pathName == "/" ?
                     "text-teal-600" : "text-gray-500 dark:text-white"} transition-colors `}>

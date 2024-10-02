@@ -9,19 +9,20 @@ import {
 import {usePathname, useSearchParams} from "next/navigation";
 
 
-export default function Pagination({ totalPages }: { totalPages: number }) {
+export default function Pagination({totalPages, className}: { totalPages: number, className?: string }) {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const currentPage = Number(searchParams.get('page')) || 1;
     const allPages = generatePagination(currentPage, totalPages);
-    const createPageURL = (pageNumber: number | string) => {
+    const createPageURL = (pageNumber: number) => {
+        pageNumber = pageNumber == 0 ? 1 : pageNumber;
         const params = new URLSearchParams(searchParams);
         params.set('page', pageNumber.toString());
         return `${pathname}?${params.toString()}`;
     };
 
     return (
-        <PaginationShad>
+        <PaginationShad className={className}>
             <PaginationContent>
                 <PaginationItem>
                     <PaginationPrevious href={createPageURL(currentPage-1)} />
@@ -30,11 +31,13 @@ export default function Pagination({ totalPages }: { totalPages: number }) {
                     if (page === '...') {
                         return <PaginationEllipsis key={index} />;
                     }
-                    return (
-                        <PaginationItem key={page}>
-                            <PaginationLink href={createPageURL(page)}>{page}</PaginationLink>
-                        </PaginationItem>
-                    );
+                    if (typeof page == "number") {
+                        return (
+                            <PaginationItem key={page}>
+                                <PaginationLink href={createPageURL(page)}>{page}</PaginationLink>
+                            </PaginationItem>
+                        );
+                    }
                 })}
                 <PaginationItem>
                     <PaginationNext href={createPageURL(currentPage+1)} />

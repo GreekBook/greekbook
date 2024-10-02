@@ -7,8 +7,8 @@ export default defineConfig({
   schema: "./src/lib/db/schema.ts",
   out: "./drizzle",
   dbCredentials: {
-    database: Resource.GreekBookDB.database,
-    secretArn: Resource.GreekBookDB.secretArn,
-    resourceArn: Resource.GreekBookDB.clusterArn,
+    database: Resource.VibePassDB.database,
+    secretArn: Resource.VibePassDB.secretArn,
+    resourceArn: Resource.VibePassDB.clusterArn,
   },
 });

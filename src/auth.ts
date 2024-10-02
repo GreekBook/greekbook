@@ -1,7 +1,7 @@
 import NextAuth, {DefaultSession} from "next-auth"
-import Google from "next-auth/providers/google"
 import {DrizzleAdapter} from "@auth/drizzle-adapter";
 import {db} from "@/lib/db/db";
+import Google from "next-auth/providers/google";
 
 declare module "next-auth" {
     /**
@@ -25,6 +25,15 @@ declare module "next-auth" {
 
 export const { auth, handlers, signIn, signOut } = NextAuth({
     adapter: DrizzleAdapter(db),
+    trustHost: true,
     providers: [Google],
-    trustHost: true
+    callbacks: {
+        session({ session }) {
+            // `session.user.address` is now a valid property, and will be type-checked
+            // in places like `useSession().data.user` or `auth().user`
+            return {
+                ...session,
+            }
+        },
+    },
 })

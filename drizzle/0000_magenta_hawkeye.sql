@@ -27,6 +27,7 @@ CREATE TABLE IF NOT EXISTS "authenticator" (
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "event_attendees" (
+	"id" text,
 	"event_id" text NOT NULL,
 	"user_id" text NOT NULL,
 	"status" text NOT NULL,
@@ -58,6 +59,13 @@ CREATE TABLE IF NOT EXISTS "events" (
 	"internal" boolean DEFAULT false NOT NULL
 );
 --> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "organization_members" (
+	"user_id" text NOT NULL,
+	"organization_id" text NOT NULL,
+	"role" text NOT NULL,
+	CONSTRAINT "organization_members_user_id_organization_id_pk" PRIMARY KEY("user_id","organization_id")
+);
+--> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "organizations" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" text NOT NULL,
@@ -65,13 +73,16 @@ CREATE TABLE IF NOT EXISTS "organizations" (
 	"created_at" timestamp NOT NULL,
 	"updated_at" timestamp NOT NULL,
 	"owner_id" text NOT NULL,
+	"image" text NOT NULL,
 	"university_id" text NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "roles" (
-	"organization_id" text PRIMARY KEY NOT NULL,
+	"organization_id" text NOT NULL,
 	"name" text NOT NULL,
-	"permissions" text[] DEFAULT '{}'::text[] NOT NULL
+	"permissions" text[] DEFAULT '{}'::text[] NOT NULL,
+	CONSTRAINT "roles_organization_id_name_pk" PRIMARY KEY("organization_id","name"),
+	CONSTRAINT "roles_name_unique" UNIQUE("name")
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "session" (
@@ -96,6 +107,7 @@ CREATE TABLE IF NOT EXISTS "user" (
 	"id" text PRIMARY KEY NOT NULL,
 	"name" text,
 	"email" text,
+	"emailVerified" timestamp,
 	"image" text,
 	"onboarded" boolean DEFAULT false NOT NULL,
 	"role" text DEFAULT 'user' NOT NULL,
@@ -104,11 +116,11 @@ CREATE TABLE IF NOT EXISTS "user" (
 	CONSTRAINT "user_email_unique" UNIQUE("email")
 );
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "users_to_organizations" (
-	"user_id" text NOT NULL,
-	"organization_id" text NOT NULL,
-	"role" text NOT NULL,
-	CONSTRAINT "users_to_organizations_user_id_organization_id_pk" PRIMARY KEY("user_id","organization_id")
+CREATE TABLE IF NOT EXISTS "verificationToken" (
+	"identifier" text NOT NULL,
+	"token" text NOT NULL,
+	"expires" timestamp NOT NULL,
+	CONSTRAINT "verificationToken_identifier_token_pk" PRIMARY KEY("identifier","token")
 );
 --> statement-breakpoint
 DO $$ BEGIN
@@ -148,6 +160,24 @@ EXCEPTION
 END $$;
 --> statement-breakpoint
 DO $$ BEGIN
+ ALTER TABLE "organization_members" ADD CONSTRAINT "organization_members_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "organization_members" ADD CONSTRAINT "organization_members_organization_id_organizations_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organizations"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "organization_members" ADD CONSTRAINT "organization_members_role_roles_name_fk" FOREIGN KEY ("role") REFERENCES "public"."roles"("name") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
  ALTER TABLE "organizations" ADD CONSTRAINT "organizations_owner_id_user_id_fk" FOREIGN KEY ("owner_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
@@ -179,18 +209,6 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "universities" ADD CONSTRAINT "universities_updated_by_user_id_fk" FOREIGN KEY ("updated_by") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "users_to_organizations" ADD CONSTRAINT "users_to_organizations_user_id_user_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
---> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "users_to_organizations" ADD CONSTRAINT "users_to_organizations_organization_id_organizations_id_fk" FOREIGN KEY ("organization_id") REFERENCES "public"."organizations"("id") ON DELETE no action ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

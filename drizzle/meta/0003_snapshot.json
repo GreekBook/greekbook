@@ -1,6 +1,6 @@
 {
-  "id": "082b21ee-224e-469f-9cce-aac8c7632cd5",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "0dd9214d-a8ad-45dc-a1f4-e4214062f41e",
+  "prevId": "016a75d4-ba66-471c-90ac-a4cad597cf52",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -322,13 +322,15 @@
           "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         },
         "featured_at": {
           "name": "featured_at",
@@ -535,13 +537,15 @@
           "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         },
         "owner_id": {
           "name": "owner_id",
@@ -737,7 +741,8 @@
           "name": "created_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         },
         "created_by": {
           "name": "created_by",
@@ -749,7 +754,8 @@
           "name": "updated_at",
           "type": "timestamp",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
         },
         "updated_by": {
           "name": "updated_by",

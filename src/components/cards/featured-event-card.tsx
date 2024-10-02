@@ -5,9 +5,23 @@ import {Calendar, MapPin, Users} from "lucide-react";
 import {Avatar, AvatarFallback, AvatarImage} from "@/components/ui/avatar";
 import {Button} from "@/components/ui/button";
 import Link from "next/link";
-import {Event} from "@/lib/db/schema";
+import {EventWithAttendees} from "@/lib/db/schema";
 
-export default function FeaturedEventCard({event}: {event: Event}) {
+export default function FeaturedEventCard({event}: { event: EventWithAttendees }) {
+    const formatDate = (date: Date) => {
+        return date.toLocaleDateString('en-US', {
+            month: 'short',
+            day: 'numeric',
+            year: 'numeric'
+        });
+    }
+
+    const formatTime = (date: Date) => {
+        return date.toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: 'numeric'
+        });
+    }
     return (
         <Card key={event.id} className="overflow-hidden">
             <div className="relative h-48 w-full">
@@ -29,15 +43,15 @@ export default function FeaturedEventCard({event}: {event: Event}) {
                 </div>
                 <div className="flex items-center text-sm text-muted-foreground mb-3">
                     <Calendar className="h-4 w-4 mr-1 flex-shrink-0" />
-                    <span>{event.startDate.getDate()} at {event.startDate.getTime()}</span>
+                    <span>{formatDate(event.startDate)} at {formatTime(event.startDate)}</span>
                 </div>
                 <div className="flex items-center justify-between">
                     <div className="flex items-center">
                         <Avatar className="h-6 w-6 mr-2">
-                            <AvatarImage src={""} alt={""} />
+                            <AvatarImage src={event.organization.image} alt={""} />
                             <AvatarFallback>{""}</AvatarFallback>
                         </Avatar>
-                        <span className="text-sm font-medium truncate">{"NAME"}</span>
+                        <span className="text-sm font-medium truncate">{event.organization.name}</span>
                     </div>
                     <div className="flex items-center text-sm text-muted-foreground">
                         <Users className="h-4 w-4 mr-1" />

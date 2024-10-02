@@ -5,11 +5,11 @@ import "sst"
 export {}
 declare module "sst" {
   export interface Resource {
-    "GreekBook": {
+    "VibePass": {
       "type": "sst.aws.Nextjs"
       "url": string
     }
-    "GreekBookDB": {
+    "VibePassDB": {
       "clusterArn": string
       "database": string
       "host": string
@@ -19,11 +19,11 @@ declare module "sst" {
       "type": "sst.aws.Postgres"
       "username": string
     }
-    "GreekBookOrgEventImages": {
+    "VibePassEventImages": {
       "name": string
       "type": "sst.aws.Bucket"
     }
-    "GreekBookVPC": {
+    "VibePassVPC": {
       "type": "sst.aws.Vpc"
     }
   }

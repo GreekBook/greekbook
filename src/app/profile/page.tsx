@@ -1,6 +1,3 @@
-'use client'
-
-import { useState } from 'react'
 import Link from 'next/link'
 import {ArrowLeft, Camera, CheckCircle, CreditCard, Trash2, UserCog, XCircle} from 'lucide-react'
 import { Button } from "@/components/ui/button"
@@ -15,21 +12,47 @@ import {
     AlertDialogTitle,
     AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
+import {auth} from "@/auth";
+import React from "react";
+import LoginPage from "@/ui/profile/login-page";
+import TopBarWithBackButton from "@/ui/top-bar-with-back-button";
+import {fetchProfile} from "@/lib/db/data";
+import SignOut from "@/ui/profile/sign-out";
 
-export default function ProfilePage() {
-    const [user, setUser] = useState({
-        id: '123e4567-e89b-12d3-a456-426614174000',
-        name: 'John Doe',
-        email: 'john.doe@example.com',
-        image: '/placeholder.svg?height=200&width=200',
-        onboarded: true,
-        role: 'user',
-        dateOfBirth: '1995-05-15T00:00:00Z',
-        kycVerified: false,
-    })
+export default async function ProfilePage() {
+    const session = await auth();
+    if (!session) {
+        return (
+            <LoginPage header={
+                <header className="bg-card p-4 flex items-center space-x-4 border-b border-border">
+                    <Link href="/">
+                        <Button variant="ghost" size="icon">
+                            <ArrowLeft className="h-6 w-6"/>
+                        </Button>
+                    </Link>
+                    <h1 className="text-2xl font-bold text-teal-600 font-museo ml-4">My Profile</h1>
+                </header>
+            }/>
+        )
+    }
+    const user = await fetchProfile();
+    if (!user) {
+        return (
+            <LoginPage header={
+                <header className="bg-card p-4 flex items-center space-x-4 border-b border-border">
+                    <Link href="/">
+                        <Button variant="ghost" size="icon">
+                            <ArrowLeft className="h-6 w-6"/>
+                        </Button>
+                    </Link>
+                    <h1 className="text-2xl font-bold text-teal-600 font-museo ml-4">My Profile</h1>
+                </header>
+            }/>
+        )
+    }
 
-    const formatDate = (dateString: string) => {
-        return new Date(dateString).toLocaleDateString('en-US', {
+    const formatDate = (date: Date) => {
+        return date.toLocaleDateString('en-US', {
             year: 'numeric',
             month: 'long',
             day: 'numeric'
@@ -38,21 +61,15 @@ export default function ProfilePage() {
 
     return (
         <div className="flex flex-col min-h-screen bg-background">
-            <header className="bg-card p-4 flex items-center space-x-4 border-b border-border">
-                <Link href="/">
-                    <Button variant="ghost" size="icon">
-                        <ArrowLeft className="h-6 w-6" />
-                    </Button>
-                </Link>
-                <h1 className="text-2xl font-semibold ml-4">My Profile</h1>
-            </header>
-
+            <TopBarWithBackButton>
+                <h1 className="text-2xl font-bold text-teal-600 font-museo ml-4">My Profile</h1>
+            </TopBarWithBackButton>
             <main className="flex-grow p-4">
-                <Card className="mb-6">
+            <Card className="mb-6">
                     <CardHeader className="flex flex-row items-center space-x-4 pb-2">
                         <Avatar className="w-20 h-20">
-                            <AvatarImage src={user.image} alt={user.name} />
-                            <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                            <AvatarImage src={user.image || ''} alt={user.name || ''}/>
+                            <AvatarFallback>{(user.name || '').charAt(0)}</AvatarFallback>
                         </Avatar>
                         <div>
                             <CardTitle>{user.name}</CardTitle>
@@ -61,7 +78,7 @@ export default function ProfilePage() {
                     </CardHeader>
                     <CardContent>
                         <Button variant="outline" className="w-full mt-2">
-                            <Camera className="w-4 h-4 mr-2" />
+                            <Camera className="w-4 h-4 mr-2"/>
                             Change Profile Picture
                         </Button>
                     </CardContent>
@@ -72,10 +89,10 @@ export default function ProfilePage() {
                         <CardTitle>Personal Information</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-2">
-                        <div className="flex justify-between">
+                        {user.dateOfBirth && <div className="flex justify-between">
                             <span className="text-sm font-medium">Date of Birth:</span>
                             <span className="text-sm">{formatDate(user.dateOfBirth)}</span>
-                        </div>
+                        </div>}
                         <div className="flex justify-between">
                             <span className="text-sm font-medium">Role:</span>
                             <Badge variant={user.role === 'admin' ? 'destructive' : 'default'}>
@@ -98,9 +115,9 @@ export default function ProfilePage() {
                                 </div>
                             </div>
                             {user.onboarded ? (
-                                <CheckCircle className="h-5 w-5 text-green-500" />
+                                <CheckCircle className="h-5 w-5 text-green-500"/>
                             ) : (
-                                <XCircle className="h-5 w-5 text-red-500" />
+                                <XCircle className="h-5 w-5 text-red-500"/>
                             )}
                         </div>
                         <div className="flex items-center justify-between">
@@ -111,13 +128,13 @@ export default function ProfilePage() {
                                 </div>
                             </div>
                             {user.kycVerified ? (
-                                <CheckCircle className="h-5 w-5 text-green-500" />
+                                <CheckCircle className="h-5 w-5 text-green-500"/>
                             ) : (
-                                <XCircle className="h-5 w-5 text-red-500" />
+                                <XCircle className="h-5 w-5 text-red-500"/>
                             )}
                         </div>
                     </CardContent>
-                    <CardFooter>
+                    <CardFooter className="flex-col gap-2.5">
                         {!user.onboarded &&
                             <Button variant="outline" className="w-full">
                                 Complete Account Setup
@@ -134,19 +151,20 @@ export default function ProfilePage() {
                         <CardTitle>Account Management</CardTitle>
                     </CardHeader>
                     <CardContent className="space-y-4">
+                        <SignOut />
                         <Button variant="outline" className="w-full justify-start">
-                            <CreditCard className="mr-2 h-4 w-4" />
+                            <CreditCard className="mr-2 h-4 w-4"/>
                             Manage Billing
                         </Button>
                         <Button variant="outline" className="w-full justify-start">
-                            <UserCog className="mr-2 h-4 w-4" />
+                            <UserCog className="mr-2 h-4 w-4"/>
                             Edit Account Information
                         </Button>
-                        <Separator />
+                        <Separator/>
                         <AlertDialog>
                             <AlertDialogTrigger asChild>
                                 <Button variant="destructive" className="w-full justify-start">
-                                    <Trash2 className="mr-2 h-4 w-4" />
+                                    <Trash2 className="mr-2 h-4 w-4"/>
                                     Delete Account
                                 </Button>
                             </AlertDialogTrigger>
@@ -160,7 +178,8 @@ export default function ProfilePage() {
                                 </AlertDialogHeader>
                                 <AlertDialogFooter>
                                     <AlertDialogCancel>Cancel</AlertDialogCancel>
-                                    <AlertDialogAction className="bg-red-600 hover:bg-red-700">Delete Account</AlertDialogAction>
+                                    <AlertDialogAction className="bg-red-600 hover:bg-red-700">Delete
+                                        Account</AlertDialogAction>
                                 </AlertDialogFooter>
                             </AlertDialogContent>
                         </AlertDialog>
